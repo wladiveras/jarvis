@@ -1,3 +1,10 @@
+export interface CategorizedMessage {
+  mensagem: string;
+  categoria: string;
+  regex: string;
+}
+
+
 export type LlmParams = {
   model: string;
   temperature?: number;
@@ -14,6 +21,7 @@ export type LlmParams = {
 export type ChatMessage = {
   role: string;
   content: string;
+  extra?: CategorizedMessage[];
 };
 
 export type LoadingType = 'idle' | 'stream' | 'message';

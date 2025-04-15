@@ -1,5 +1,86 @@
 import type { ChatMessage, LlmParams } from '~~/types';
 
+export interface CategorizedMessage {
+  mensagem: string;
+  categoria: string;
+  regex: string;
+}
+
+export function categorizeMessages(
+  messages: { mensagem: string }[]
+): CategorizedMessage[] {
+  const categorias = [
+    {
+      categoria: 'Valor Total e Taxas',
+      regex:
+        /^(?:qual|qto|quanto) (?:é|custa|tem) (?:incluído|incluso) (?:taxa|taxas|preço|valor)?$|^(?:quanto|qual) valor (?:é|será) (?:cobrado|taxado)?$/,
+    },
+    {
+      categoria: 'Inclusão de Taxas no Valor',
+      regex:
+        /^(?:tudo|incluído|incluso) (?:está|será) (?:n|na) (?:conta|boleto)?$|^(?:já|ja) (?:está|esta) (?:incluso|incluído)?$/,
+    },
+    {
+      categoria: 'Inclusão de Laudo e Exame',
+      regex:
+        /^(?:laudo|exame|psicotécnico|psicológico) (?:está|estão) (?:incluso|incluídos)?$|^(?:incluso|incluído) (?:laudo|exame)?$/,
+    },
+    {
+      categoria: 'Esclarecimento de Valor',
+      regex:
+        /^(?:qual|qto|quanto) (?:custa|costam|fica|ficam) (?:exame|laudo|taxa|taxas)? (?:por fora)?$|^(?:valor|preço) (?:é|será) (?:este|esse)?$/,
+    },
+    {
+      categoria: 'Esclarecimento de Inclusão',
+      regex:
+        /^(?:é|será) (?:incluso|incluído) (?:laudo|exame)?$|^(?:laudo|exame) (?:é|está) (?:incluso|incluído)?$/,
+    },
+    {
+      categoria: 'Pagamento e Inclusão de Taxas',
+      regex:
+        /^(?:pagamento|preço|valor) (?:é|será) (?:com|sem) (?:taxa|taxas|laudo|exame)?$|^(?:eu|Eu) (?:vou|quer) (?:pagar|pagando)?$/,
+    },
+    {
+      categoria: 'Etapas de Pagamento',
+      regex:
+        /^(?:pagamento|taxas|exames) (?:por|em) (?:etapas|parcelas)?$|^(?:quais|quais são) (?:exames|taxas)?$/,
+    },
+    {
+      categoria: 'Esclarecimento de Taxas e Exames',
+      regex: /^(?:o que|quais são) (?:as taxas|taxas)?$|^(?:exame|psicotécnico|psicológico) (?:é|o que)?$/,
+    },
+    {
+      categoria: 'Local do Exame Médico',
+      regex: /^(?:onde|local) (?:exame|laudo|médico)?$/,
+    },
+  ];
+
+  const categorizedMessages: CategorizedMessage[] = [];
+
+  for (const { mensagem } of messages) {
+    let categoriaEncontrada = 'Sem Categoria';
+    let regexEncontrado = '';
+
+    for (const { categoria, regex } of categorias) {
+      const regexObj = new RegExp(regex, 'i');
+      if (regexObj.test(mensagem)) {
+        categoriaEncontrada = categoria;
+        regexEncontrado = regex;
+        break;
+      }
+    }
+
+    categorizedMessages.push({
+      mensagem,
+      categoria: categoriaEncontrada,
+      regex: regexEncontrado,
+    });
+  }
+
+  return categorizedMessages;
+}
+
+
 export function useChat() {
   async function* streamResponse(
     url: string,
@@ -82,6 +163,7 @@ export function useChat() {
   }
 
   return {
+    categorizeMessages,
     getResponse,
     streamResponse,
   };

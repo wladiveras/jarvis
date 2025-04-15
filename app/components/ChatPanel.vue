@@ -2,6 +2,7 @@
   <div class="flex flex-col h-full bg-gray-50 dark:bg-gray-950">
     <ChatHeader
       :clear-disabled="chatHistory.length === 0"
+
       @clear="$emit('clear')"
       @show-drawer="$emit('showDrawer')"
     />
@@ -9,8 +10,13 @@
     <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 space-y-5">
       <div
       v-for="(message, index) in chatHistory"
-      :key="`message-${index}`"
+      :key="`message-${index}-${message.extra}`"
       class="flex items-start gap-x-4"
+
+
+
+
+        
       >
       <div
         class="w-12 h-12 p-2 rounded-full"
@@ -31,11 +37,19 @@
         />
       </div>
       <div v-if="message.role === 'user'">
-        {{ message.content }}
+         {{ message.content }}
+         <pre v-if="Array.isArray(message.extra)" class="bg-gray-800 p-2 rounded text-sm overflow-auto" v-html="formatJson(JSON.stringify(message.extra))" />
       </div>
       <div v-else>
         <pre v-if="isJson(message.content)" class="bg-gray-800 p-2 rounded text-sm overflow-auto" v-html="formatJson(message.content)" />
-       
+
+
+
+        
+        
+        
+        
+        
         <AssistantMessage v-else :content="message.content" />
       </div>
       </div>
@@ -70,12 +84,14 @@
 </template>
 
 <script setup lang="ts">
-import type { ChatMessage, LoadingType } from '~~/types';
+import type { ChatMessage, LoadingType, CategorizedMessage } from '~~/types';
+import { categorizeMessages } from '~~/app/composables/useChat';
 
 const props = defineProps<{
-  chatHistory: ChatMessage[];
+  chatHistory: Array<ChatMessage>;
   loading: LoadingType;
 }>();
+
 
 const emit = defineEmits<{
   message: [message: string];
@@ -85,7 +101,9 @@ const emit = defineEmits<{
 
 const userMessage = ref('');
 const chatContainer = useTemplateRef('chatContainer');
-let observer: MutationObserver | null = null;
+let observer: MutationObserver | null = null
+const resultMessages = ref<any[]>([])
+
 
 onMounted(() => {
   if (chatContainer.value) {
@@ -124,9 +142,23 @@ watch(
 const sendMessage = () => {
   if (!userMessage.value.trim()) return;
 
-  emit('message', userMessage.value);
+  const message = userMessage.value;
+  emit('message', message);
+  
+  resultMessages.value = categorizeMessages([{ mensagem: message }]);
+    props.chatHistory.forEach((msg, i) => {
+     if(msg.role === 'user' && msg.content === message){
+      props.chatHistory[i].extra = resultMessages.value;
+     }
+  })
+  resultMessages.value = []
 
-  userMessage.value = '';
+  
+    userMessage.value = '';
+   
+  } catch (error) {
+    return false;
+  }
 };
 const isJson = (str: string): boolean => {
   try {
@@ -136,7 +168,6 @@ const isJson = (str: string): boolean => {
     return false;
   }
 };
-
 
 const formatJson = (jsonString: string): string => {
   try {
@@ -163,4 +194,11 @@ const formatJson = (jsonString: string): string => {
     return jsonString;
   }
 };
+
 </script>
+
+
+
+
+
+
