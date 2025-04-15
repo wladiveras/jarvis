@@ -37,11 +37,79 @@ import type { ChatMessage, LlmParams, LoadingType } from '~~/types';
 const isDrawerOpen = ref(false);
 
 const defaultSettings: LlmParams = {
-  model: '@cf/meta/llama-3.2-3b-instruct',
+  model: '@cf/meta/llama-4-scout-17b-16e-instruct',
   temperature: 0.2,
   maxTokens: 512,
+
   systemPrompt: `
-  "Você é um sistema de categorização inteligente de mensagens de clientes de uma autoescola. Sua tarefa é: Analisar uma lista de mensagens reais enviadas por clientes. Para cada mensagem: 1. Classifique a mensagem com uma **categoria única**, descritiva e objetiva, baseada na intenção da frase. 2. Crie uma **regex robusta no padrão .NET**, com agrupamentos e variações para detectar mensagens semelhantes. A regex deve: - Ser compatível com .NET. - Usar agrupamentos e palavras alternadas. - Lidar com português informal (abreviações, erros comuns, variações de escrita). - Ser precisa para evitar falsos positivos. Formato obrigatório da resposta (em JSON por mensagem): [ { \"mensagem\": \"<mensagem original>\", \"categoria\": \"<categoria atribuída>\", \"regex\": \"<regex .NET robusta gerada para identificar mensagens similares>\" }, ... (repetir para cada mensagem) ] ⚠️ Não adicione explicações nem mensagens fora do JSON. ⚠️ Não agrupe tudo em uma única categoria genérica, seja específico na intenção de cada frase. ⚠️ Não escreva texto fora do JSON. 📥 Mensagens: {mensagens} 📂 Categorias já existentes (para tentar agrupar): {categoriasText}"
+Você é um sistema inteligente de categorização automática de mensagens enviadas por clientes em um chat de atendimento de uma autoescola.
+
+Sua tarefa: Analisar a seguinte mensagem do cliente e, caso não se encaixe nas categorias fornecidas, crie uma nova categoria, um slug e uma regex .NET para identificá-la.
+
+Mensagem do cliente: "Queria saber se vocês dão desconto para pagamento à vista do curso completo."
+
+Categorias já existentes:
+[
+  {
+    "nome": "Valores / Preços",
+    "slug": "valores-precos",
+    "regex": "(quanto\\s+custa|qual\\s+o\\s+valor|preço\\s+de|valores\\s+para|custo\\s+da).*?(cnh|carteira\\s+de\\s+motorista|habilitação).*"
+  },
+  {
+    "nome": "Formas de Pagamento",
+    "slug": "formas-de-pagamento",
+    "regex": "(aceita|quais\\s+as\\s+formas\\s+de\\s+pagamento|como\\s+posso\\s+pagar|pagamento\\s+em).*?(cartão|boleto|à\\s+vista|pix).*"
+  },
+  {
+    "nome": "Informações Gerais / Dúvidas",
+    "slug": "informacoes-gerais-duvidas",
+    "regex": "(como\\s+funciona|o\\s+que\\s+preciso\\s+para|qual\\s+o\\s+procedimento|mais\\s+informações\\s+sobre|dúvida\\s+sobre).*?(cnh|carteira\\s+de\\s+motorista|habilitação|aulas|exames|matrícula).*"
+  },
+  {
+    "nome": "Matrícula / Início do Processo",
+    "slug": "matricula-inicio-processo",
+    "regex": "(quero\\s+me\\s+matricular|como\\s+faço\\s+a\\s+matrícula|iniciar\\s+o\\s+processo\\s+da\\s+cnh|primeira\\s+habilitação).*"
+  },
+  {
+    "nome": "Descontos e Promoções",
+    "slug": "descontos-e-promocoes",
+    "regex": "(tem\\s+desconto|qual\\s+o\\s+desconto|promoção\\s+para|valor\\s+com\\s+desconto).*"
+  }
+]
+
+Ao criar uma nova categoria, o regex deve ser genérico e lidar com variações comuns de escrita. Ele deve capturar palavras-chave e frases relacionadas ao tema da mensagem, evitando ser muito específico ou literal. Por exemplo:
+
+Mensagem do cliente: "O que seria as taxas? Quando você diz que inclui todas as taxas, você tá falando do que? As taxas do detran? É necessário o psicotécnico e exame médico? E o exame médico? Precisa fazer?"
+
+Regex gerado: "(\\b(laudo|exame).*(inclu(so|sos|ido|ído))\\b)|" +
+             "(\\b(mais).*(tax(a|as))\\b)|" +
+             "(\\b(inclu(so|sos|ido|ído|ir|indo)|custo.*(laudo|exam(e|es)))\\b)|" +
+             "(\\bpago.*mais.*alguma\\b)|" +
+             "(\\bvalor.*pagar.*por.*fora\\b)|" +
+             "(\\btaxas.*já.*vem.*excluindo\\b)|" +
+             "(\\bcom.*(laudo|exame).*ou.*sem\\b)|" +
+             "(\\bpag(a|ava).*etap(a|as)\\b)|" +
+             "(\\bexam(e|es).*qua(l|is)\\b)|" +
+             "(\\bs(ão|ao).*só.*tax(a|as)\\b)|" +
+             "(\\btaxas.*pag(a|as).*(de.*uma.*vez|junt(o|os|a))\\b)|" +
+             "(\\b.*é.*o.*psico(teste|técnico|tecnico)\\b)|" +
+             "(\\bexame.*m(é|e)dico\\b)|" +
+             "(\\b(o.*que|oque|qua(is|l)).*(s(ão|ao|eria)|é|e).*tax(a|as)\\b)|" +
+             "(\\btax(as|a).*detran\\b)|" +
+             "(\\binclui.*todas.*as.*tax(as|a).*(do.*que)\\b)"
+
+A resposta deve ser um objeto JSON no seguinte formato:
+
+{
+  "Categoria correspondente": "[nome da categoria]"
+}
+{
+  "Nova categoria": "[nome da nova categoria]",
+  "Slug": "[slug da categoria]",
+  "Mensagens base": "[mensagem do cliente]",
+  "Regex": "[regex .NET]"
+}
+A regex deve ser compatível com .NET, usar agrupamentos e palavras alternadas quando apropriado, lidar com variações comuns de escrita e ser precisa para evitar falsos positivos.
   `,
   stream: true,
 };

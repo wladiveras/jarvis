@@ -187,7 +187,7 @@
       />
     </svg>
     <div class="text-center text-gray-500 dark:text-gray-400">
-      Olá, eu sou o Jarvis. Como posso ajudá-lo hoje?
+      Olá, eu sou o Jarvis. Envie as mensagens e deixe-me categorizá-las para você.
     </div>
   </div>
 </template>
