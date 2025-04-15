@@ -41,13 +41,14 @@ const defaultSettings: LlmParams = {
   temperature: 0.2,
   maxTokens: 4096,
 
- systemPrompt: `Você é um sistema inteligente de categorização automática de mensagens enviadas por clientes em um chat de atendimento de uma autoescola.
+  systemPrompt: `Você é um sistema inteligente de categorização automática de mensagens enviadas por clientes em um chat de atendimento de uma autoescola.
 
 Sua tarefa: Analisar uma lista de mensagens fornecida pelo cliente. Você deve categorizar cada mensagem, e, caso não se encaixe nas categorias fornecidas, crie uma nova categoria, um slug e uma regex .NET para identificá-la.
 
 As mensagens serão fornecidas no seguinte formato:
 \`\`\`
- - [mensagem 1] - [mensagem 2] - [mensagem 3] ...\n\`\`\`
+ - [mensagem 1] - [mensagem 2] - [mensagem 3] ...
+\`\`\`
 
 Categorias existentes para classificar as mensagens são:
   - Valor Total e Taxas
@@ -81,7 +82,7 @@ Você deve responder com um array JSON válido contendo um objeto para cada mens
     "categoria": "[categoria da mensagem]",
     "regex": "[regex correspondente à categoria da mensagem]"
   },
-   {
+  {
     "mensagem": "[mensagem do cliente]",
     "categoria": "[categoria da mensagem]",
     "regex": "[regex correspondente à categoria da mensagem]"
@@ -117,10 +118,7 @@ Exemplo de resposta para nova categoria:
 
 A regex deve ser compatível com .NET, usar agrupamentos e palavras alternadas quando apropriado, lidar com variações comuns de escrita e ser precisa para evitar falsos positivos.
 
-Importante: A resposta deve ser apenas o JSON, sem nenhum outro texto ou formatação extra.
-
-Lembre-se: Você deve retornar sempre um array JSON no primeiro caso ou dois objetos JSON no segundo caso, e nada mais.
-` ,
+Importante: A resposta deve ser apenas o JSON, sem nenhum outro texto ou formatação extra.`,
   stream: true,
 };
 
@@ -148,60 +146,8 @@ async function sendMessage(message: string) {
     let responseAdded = false;
     for await (const chunk of response) {
       if (responseAdded) {
-        // add the chunk to the current message's content
         chatHistory.value[chatHistory.value.length - 1]!.content += chunk;
       } else {
-        // add a new message to the chat history
-        chatHistory.value.push({
-          role: 'assistant',
-          content: chunk,
-        });
-
-        responseAdded = true;
-      }
-    }
-  } catch (erro) {
-    console.error('Erro ao enviar mensagem:', erro);
-  } finally {
-    loading.value = 'idle';
-  }
-}
-</script>
-A regex deve ser compatível com .NET, usar agrupamentos e palavras alternadas quando apropriado, lidar com variações comuns de escrita e ser precisa para evitar falsos positivos.
-
-Importante: A resposta deve ser apenas o JSON, sem nenhum outro texto ou formatação extra.
-`,
-  stream: true,
-};
-
-const llmParams = useStorageAsync<LlmParams>('llmParams', {
-  ...defaultSettings,
-});
-const resetSettings = () => {
-  llmParams.value = { ...defaultSettings };
-};
-
-const chatHistory = ref<ChatMessage[]>([]);
-const loading = ref<LoadingType>('idle');
-async function sendMessage(message: string) {
-  chatHistory.value.push({ role: 'user', content: message });
-
-  try {
-    loading.value = llmParams.value.stream ? 'stream' : 'message';
-
-    const response = useAIChat('/api/chat', llmParams.value.model, {
-      ...llmParams.value,
-      model: undefined,
-      messages: chatHistory.value,
-    })();
-
-    let responseAdded = false;
-    for await (const chunk of response) {
-      if (responseAdded) {
-        // add the chunk to the current message's content
-        chatHistory.value[chatHistory.value.length - 1]!.content += chunk;
-      } else {
-        // add a new message to the chat history
         chatHistory.value.push({
           role: 'assistant',
           content: chunk,
