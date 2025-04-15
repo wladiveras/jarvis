@@ -137,6 +137,7 @@ const isJson = (str: string): boolean => {
   }
 };
 
+
 const formatJson = (jsonString: string): string => {
   try {
     const json = JSON.parse(jsonString);
