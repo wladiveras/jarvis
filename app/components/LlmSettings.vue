@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between px-4 h-14">
       <div class="flex items-center gap-x-4">
         <h2 class="md:text-lg text-gray-600 dark:text-gray-300">
-          LLM Settings
+          Configurações do Jarvis
         </h2>
       </div>
       <UButton
@@ -22,7 +22,7 @@
 
       <RangeInput
         v-model="llmParams.temperature"
-        label="Temperature"
+        label="Temperatura"
         :min="0"
         :max="5"
         :step="0.1"
@@ -30,26 +30,21 @@
 
       <RangeInput
         v-model="llmParams.maxTokens"
-        label="Max Tokens"
+        label="Máximo de Tokens"
         :min="1"
         :max="4096"
       />
 
-      <UFormGroup label="System Prompt">
+      <UFormGroup label="Prompt">
         <UTextarea
           v-model="llmParams.systemPrompt"
-          :rows="3"
-          :maxrows="8"
+          :rows="15"
+          :maxrows="15"
           autoresize
         />
       </UFormGroup>
 
-      <div class="flex items-center justify-between">
-        <span>Stream Response</span>
-        <UToggle v-model="llmParams.stream" />
-      </div>
-
-      <UAccordion
+      <!-- <UAccordion
         :items="accordionItems"
         color="white"
         variant="solid"
@@ -74,7 +69,7 @@
 
             <RangeInput
               v-model="llmParams.frequencyPenalty"
-              label="Frequency Penalty"
+                label="Penalidade de Frequência"
               :min="0"
               :max="2"
               :step="0.1"
@@ -82,7 +77,7 @@
 
             <RangeInput
               v-model="llmParams.presencePenalty"
-              label="Presence Penalty"
+              label="Penalidade de Presença"
               :min="0"
               :max="2"
               :step="0.1"
@@ -90,31 +85,20 @@
 
             <RangeInput
               v-model="llmParams.repetitionPenalty"
-              label="Repetition Penalty"
+              label="Penalidade de Repetição"
               :min="0"
               :max="2"
               :step="0.1"
             />
           </UCard>
         </template>
-      </UAccordion>
+      </UAccordion> -->
 
-      <UButton color="gray" size="sm" block @click="$emit('reset')">
-        Reset settings
-      </UButton>
+      <!-- <UButton color="gray" size="sm" block @click="$emit('reset')">
+        Resetar Configurações
+      </UButton> -->
     </div>
-    <div class="p-2">
-      <UButton
-        to="https://hub.nuxt.com?utm_source=hub-chat"
-        target="_blank"
-        variant="link"
-        color="gray"
-        rel="noopener"
-        size="sm"
-      >
-        Hosted on NuxtHub
-      </UButton>
-    </div>
+ 
   </div>
 </template>
 
@@ -130,7 +114,7 @@ defineEmits(['hideDrawer', 'reset']);
 
 const accordionItems = [
   {
-    label: 'Advanced Settings',
+    label: 'Configurações Avançadas',
     defaultOpen: false,
   },
 ];

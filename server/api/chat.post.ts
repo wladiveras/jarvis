@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   if (!model || !params) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Missing chat model or params',
+      statusMessage: 'Modelo de chat ou parâmetros ausentes',
     });
   }
 
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
     console.error(error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Error processing request',
+      statusMessage: 'Erro ao processar a solicitação',
     });
   }
 });

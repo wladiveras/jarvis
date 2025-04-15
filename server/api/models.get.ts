@@ -34,7 +34,7 @@ export default defineCachedEventHandler(
 
       return response.result.map((model) => model.name);
     } catch (error) {
-      console.error('Error fetching models:', error);
+      console.error('Erro ao buscar modelos:', error);
     }
 
     return [];

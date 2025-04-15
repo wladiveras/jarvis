@@ -22,7 +22,7 @@ export function useAIChat(
 
           if (done) {
             if (buffer.trim()) {
-              console.warn('Stream ended with unparsed data:', buffer);
+                console.warn('Fluxo terminou com dados não analisados:', buffer);
             }
             return;
           }
@@ -42,7 +42,7 @@ export function useAIChat(
                   yield jsonData.response;
                 }
               } catch (parseError) {
-                console.warn('Error parsing JSON:', parseError);
+                console.warn('Erro ao analisar JSON:', parseError);
               }
             }
           }
@@ -53,7 +53,7 @@ export function useAIChat(
         return;
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Erro ao enviar mensagem:', error);
       throw error;
     }
   }

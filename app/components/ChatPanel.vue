@@ -43,7 +43,7 @@
       <UTextarea
         ref="userInput"
         v-model="userMessage"
-        placeholder="How can I help you today?"
+        placeholder="Como posso te ajudar hoje?"
         class="w-full"
         :ui="{ padding: { xl: 'pr-11' } }"
         :rows="1"

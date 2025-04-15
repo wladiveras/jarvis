@@ -25,7 +25,7 @@ export function useChat() {
 
         if (done) {
           if (buffer.trim()) {
-            console.warn('Stream ended with unparsed data:', buffer);
+            console.warn('Fluxo terminou com dados não analisados:', buffer);
           }
 
           return;
@@ -54,7 +54,7 @@ export function useChat() {
         }
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Erro ao enviar mensagem:', error);
 
       throw error;
     }
@@ -76,7 +76,7 @@ export function useChat() {
 
       return response;
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Erro ao enviar mensagem:', error);
       throw error;
     }
   }
