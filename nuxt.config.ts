@@ -5,12 +5,20 @@ export default defineNuxtConfig({
   future: { compatibilityVersion: 4 },
 
   // https://nuxt.com/modules
-  modules: ['@nuxthub/core', '@nuxt/eslint', '@nuxt/ui', '@nuxtjs/mdc', '@nuxthub/core'],
+  modules: ['@nuxt/ui-pro', '@nuxt/content', '@nuxthub/core'],
+  css: ['~/assets/css/main.css'],
 
   // https://hub.nuxt.com/docs/getting-started/installation#options
   hub: {
     ai: true,
     cache: true,
+  },
+
+  content: {
+    highlight: {
+      theme: 'github-dark',
+      preload: ['json']
+    }
   },
 
   // https://devtools.nuxt.com
