@@ -43,7 +43,9 @@ const defaultSettings: LlmParams = {
 
   systemPrompt: `Você é um sistema inteligente de categorização automática de mensagens enviadas por clientes em um chat de atendimento de uma autoescola.
 
-Sua tarefa: Analisar uma lista de mensagens fornecida pelo cliente. Você deve categorizar cada mensagem, e, caso não se encaixe nas categorias fornecidas, crie uma nova categoria, um slug e uma regex .NET para identificá-la.
+
+
+Sua tarefa: Analisar uma lista de mensagens fornecida pelo cliente. Você deve categorizar cada mensagem e, caso não se encaixe nas categorias fornecidas, criar uma nova categoria, um slug e uma regex .NET para identificá-la.
 
 As mensagens serão fornecidas no seguinte formato:
 \`\`\`
@@ -77,57 +79,12 @@ Quando necessário criar uma nova categoria, o regex deve ser genérico e lidar 
 O regex deve seguir o padrão .NET e usar agrupamentos e palavras alternadas para capturar variações. Aqui está um exemplo de regex genérico para capturar mensagens relacionadas a taxas e exames:
 
 \`\`\`
-(\b(laudo|exame).(inclu(so|sos|ido|ído))\b)|
-(\b(mais).(tax(a|as))\b)|
-(\b(inclu(so|sos|ido|ído|ir|indo)|custo.(laudo|exam(e|es)).)\b)|
-(\bpago mais alguma\b)|
-(\bvalor . pagar .por fora\b)|
-(\btaxas já vem excluindo\b)|
-(\bcom.(laudo|exame) ou sem\b)|
-(\bpag(a|ava).etap(a|as)\b)|
-(\bexam(e|es).qua(l|is)\b)|
-(\bs(ão|ao) só.tax(a|as)\b)|
-(\btaxas.pag(a|as).(de uma vez|junt(o|os|a))\b)|
-(\b.é.o.psico(teste|técnico|tecnico)\b)|
-(\bexame m(é|e)dico\b)|
-(\b(o que|oque|qua(is|l)) (s(ão|ao|eria)|é|e).tax(a|as)\b)|
-(\btax(as|a).detran\b)|
-(\binclui todas as tax(as|a).* (do que)\b)
+(pago mais alguma)|(valor . pagar .por fora)|(taxas já vem excluindo)|(com.(laudo|exame) ou sem)|(pag(a|ava).etap(a|as))|(exam(e|es).qua(l|is))|(s(ão|ao) só.tax(a|as))|(taxas.pag(a|as).(de uma vez|junt(o|os|a)))|(.é.o.psico(teste|técnico|tecnico))|(exame m(é|e)dico)|((o que|oque|qua(is|l)) (s(ão|ao|eria)|é|e).tax(a|as))|(tax(as|a).detran)|(inclui todas as tax(as|a).* (do que))
 \`\`\`
 
-Você deve responder com um array JSON válido contendo um objeto para cada mensagem, com os seguintes atributos:
-\`\`\`json
-[
-  {
-    "mensagem": "[mensagem do cliente]",
-    "categoria": "[categoria da mensagem]",
-    "regex": "[regex correspondente à categoria da mensagem]"
-  },
-  {
-    "mensagem": "[mensagem do cliente]",
-    "categoria": "[categoria da mensagem]",
-    "regex": "[regex correspondente à categoria da mensagem]"
-  }
-]
-\`\`\`
+você deve enviar apenas o json como resposta para a mensagem do cliente, sem formatação ou explicações adicionais.
 
-Caso precise criar uma nova categoria, responda primeiro com um objeto JSON neste formato:
-\`\`\`json
-{
-  "Categoria correspondente": "[nome da categoria mais próxima]"
-}
-\`\`\`
-E em seguida, retorne um segundo objeto com os detalhes da nova categoria criada, no seguinte formato:
-\`\`\`json
-{
-  "Nova categoria": "[nome da nova categoria]",
-  "Slug": "[slug da categoria]",
-  "Mensagens base": "[mensagem do cliente]",
-  "Regex": "[regex .NET criada para a nova categoria]"
-}
-\`\`\`
-
-Importante: A resposta deve ser apenas o JSON, sem nenhum outro texto ou formatação extra.`,
+Você deve responder com um único regex genérico que englobe todas as mensagens fornecidas, no formato acima. A resposta deve ser apenas o regex, sem nenhum outro texto ou formatação extra.`,
   stream: true,
 };
 

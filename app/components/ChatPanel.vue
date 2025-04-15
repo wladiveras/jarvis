@@ -1,5 +1,5 @@
 <template>
-   <div class="flex flex-col h-full bg-gray-50 dark:bg-gray-950">
+ <div class="flex flex-col h-full bg-gray-50 dark:bg-gray-950">
     <ChatHeader
       :clear-disabled="chatHistory.length === 0"
       @clear="$emit('clear')"
@@ -164,8 +164,13 @@ const isJson = (str: string): boolean => {
 const formatJson = (jsonString: string): string => {
   try {
     const json = JSON.parse(jsonString);
-    return JSON.stringify(json, null, 2)
-      .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|\b\d+\b)/g, (match) => {
+
+    // Substitui \\s por espaços reais em todos os valores de regex
+    const processedJson = JSON.stringify(json, null, 2).replace(/\\\\s/g, " ");
+
+    return processedJson.replace(
+      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|\b\d+\b)/g,
+      (match) => {
         let cls = 'text-gray-300'; // Default color
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
@@ -181,12 +186,12 @@ const formatJson = (jsonString: string): string => {
           cls = 'text-red-400'; // Numbers
         }
         return `<span class="${cls}">${match}</span>`;
-      });
+      }
+    );
   } catch {
     return jsonString;
   }
 };
-
 </script>
 
 
