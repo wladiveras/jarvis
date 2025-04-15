@@ -1,13 +1,12 @@
 <template>
-  <div class="flex flex-col h-full bg-gray-50 dark:bg-gray-950">
+   <div class="flex flex-col h-full bg-gray-50 dark:bg-gray-950">
     <ChatHeader
       :clear-disabled="chatHistory.length === 0"
-
       @clear="$emit('clear')"
       @show-drawer="$emit('showDrawer')"
     />
     <UDivider />
-        <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 space-y-5">
+    <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 space-y-5">
       <div
         v-for="(message, index) in chatHistory"
         :key="`message-${index}`"
@@ -15,7 +14,9 @@
       >
         <div
           class="w-12 h-12 p-2 rounded-full"
-          :class="`${message.role === 'user' ? 'bg-primary/20' : 'bg-blue-500/20'}`"
+          :class="`${
+            message.role === 'user' ? 'bg-primary/20' : 'bg-blue-500/20'
+          }`"
         >
           <UIcon
             :name="`${
@@ -24,16 +25,28 @@
                 : 'i-heroicons-sparkles-solid'
             }`"
             class="w-8 h-8"
-            :class="`${message.role === 'user' ? 'text-primary-400' : 'text-blue-400'}`"
+            :class="`${
+              message.role === 'user' ? 'text-primary-400' : 'text-blue-400'
+            }`"
           />
-      </div>
-        <pre v-if="isJson(message.content)" class="bg-gray-800 p-2 rounded text-sm overflow-auto" v-html="formatJson(message.content)" />
-        <AssistantMessage v-else :content="message.content" />
+        </div>
+        <div v-if="message.role === 'user'">
+          {{ message.content }}
+        </div>
+        <div v-else>
+          <pre
+            v-if="isJson(message.content)"
+            class="bg-gray-800 p-2 rounded text-sm overflow-auto text-white"
+            v-html="formatJson(message.content)"
+          />
+          <div v-else>
+            {{ message.content }}
+          </div>
+        </div>
       </div>
       <ChatLoadingSkeleton v-if="loading === 'message'" />
       <NoChats v-if="chatHistory.length === 0" class="h-full" />
     </div>
-
     <UDivider />
     <div class="flex items-start p-3.5 relative">
       <UTextarea
@@ -62,14 +75,13 @@
 </template>
 
 <script setup lang="ts">
-import type { ChatMessage, LoadingType, CategorizedMessage } from '~~/types';
+import type { ChatMessage, LoadingType } from '~~/types';
 import { categorizeMessages } from '~~/app/composables/useChat';
 
 const props = defineProps<{
-  chatHistory: Array<ChatMessage>;
+  chatHistory: ChatMessage[];
   loading: LoadingType;
 }>();
-
 
 const emit = defineEmits<{
   message: [message: string];
@@ -79,7 +91,9 @@ const emit = defineEmits<{
 
 const userMessage = ref('');
 const chatContainer = useTemplateRef('chatContainer');
+
 let observer: MutationObserver | null = null
+
 const resultMessages = ref<any[]>([])
 
 
@@ -142,7 +156,7 @@ const isJson = (str: string): boolean => {
   try {
     JSON.parse(str);
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 };
@@ -168,7 +182,7 @@ const formatJson = (jsonString: string): string => {
         }
         return `<span class="${cls}">${match}</span>`;
       });
-  } catch (error) {
+  } catch {
     return jsonString;
   }
 };

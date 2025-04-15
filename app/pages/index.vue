@@ -72,7 +72,28 @@ Categorias existentes para classificar as mensagens são:
   - inclusao_exames
   - pagamento_adicional
 
-Quando necessário criar uma nova categoria, o regex deve ser genérico e lidar com variações comuns de escrita, capturando palavras-chave e frases relacionadas ao tema da mensagem, evitando ser muito específico ou literal.
+Quando necessário criar uma nova categoria, o regex deve ser genérico e lidar com variações comuns de escrita, capturando palavras-chave e frases relacionadas ao tema da mensagem. Evite ser muito específico ou literal.
+
+O regex deve seguir o padrão .NET e usar agrupamentos e palavras alternadas para capturar variações. Aqui está um exemplo de regex genérico para capturar mensagens relacionadas a taxas e exames:
+
+\`\`\`
+(\b(laudo|exame).(inclu(so|sos|ido|ído))\b)|
+(\b(mais).(tax(a|as))\b)|
+(\b(inclu(so|sos|ido|ído|ir|indo)|custo.(laudo|exam(e|es)).)\b)|
+(\bpago mais alguma\b)|
+(\bvalor . pagar .por fora\b)|
+(\btaxas já vem excluindo\b)|
+(\bcom.(laudo|exame) ou sem\b)|
+(\bpag(a|ava).etap(a|as)\b)|
+(\bexam(e|es).qua(l|is)\b)|
+(\bs(ão|ao) só.tax(a|as)\b)|
+(\btaxas.pag(a|as).(de uma vez|junt(o|os|a))\b)|
+(\b.é.o.psico(teste|técnico|tecnico)\b)|
+(\bexame m(é|e)dico\b)|
+(\b(o que|oque|qua(is|l)) (s(ão|ao|eria)|é|e).tax(a|as)\b)|
+(\btax(as|a).detran\b)|
+(\binclui todas as tax(as|a).* (do que)\b)
+\`\`\`
 
 Você deve responder com um array JSON válido contendo um objeto para cada mensagem, com os seguintes atributos:
 \`\`\`json
@@ -105,18 +126,6 @@ E em seguida, retorne um segundo objeto com os detalhes da nova categoria criada
   "Regex": "[regex .NET criada para a nova categoria]"
 }
 \`\`\`
-
-Exemplo de resposta para mensagens com categorias já existentes:
-\`\`\`json
-[{"mensagem": "1800 a vista mais taxas ?? 2000 e não tá incluído taxas","categoria": "duvida_valor_taxas","regex": "^(\\\\d+\\\\s*a\\\\s*vista\\\\s*mais\\\\s*taxas?|\\\\d+\\\\s*e\\\\s*não\\\\s*tá\\\\s*incluído\\\\s*taxas)$"},{"mensagem": "Essa que é de 4× no boleto de 590 já é incluído tudo isso ?","categoria": "duvida_inclusao_taxas","regex": "^Essa\\\\s*que\\\\s*é\\\\s*de\\\\s*4×\\\\s*no\\\\s*boleto\\\\s*de\\\\s*590\\\\s*já\\\\s*é\\\\s*incluído\\\\s*tudo\\\\s*isso\\?$"}]
-\`\`\`
-Exemplo de resposta para nova categoria:
-\`\`\`json
-{"Categoria correspondente": "Descontos e Promoções"}
-{"Nova categoria": "Descontos para Pagamento à Vista","Slug": "descontos-para-pagamento-a-vista","Mensagens base": "Queria saber se vocês dão desconto para pagamento à vista do curso completo.","Regex": "(desconto|descontos|à\\\\s+vista|pagamento).*?(curso|mensal|completo).*"}
-\`\`\`
-
-A regex deve ser compatível com .NET, usar agrupamentos e palavras alternadas quando apropriado, lidar com variações comuns de escrita e ser precisa para evitar falsos positivos.
 
 Importante: A resposta deve ser apenas o JSON, sem nenhum outro texto ou formatação extra.`,
   stream: true,

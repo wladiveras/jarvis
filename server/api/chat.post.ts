@@ -20,6 +20,21 @@ export default defineEventHandler(async (event) => {
 
   const ai = hubAI();
 
+  // Função para validar regex
+  const isValidRegex = (regex: string): boolean => {
+    try {
+      new RegExp(regex); // Tenta criar o regex
+      return true;
+    } catch {
+      return false; // Retorna falso se o regex for inválido
+    }
+  };
+
+  // Função para limpar escapes desnecessários
+  const cleanRegex = (regex: string): string => {
+    return regex.replace(/\\\\s/g, "\\s"); // Substitui \\s por \s
+  };
+
   try {
     const result = await ai.run(model, {
       messages: params.systemPrompt
@@ -28,13 +43,30 @@ export default defineEventHandler(async (event) => {
       ...config,
     });
 
-    return params.stream
+    let response = params.stream
       ? sendStream(event, result as ReadableStream)
-      : (
-          result as {
-            response: string;
+      : (result as { response: string }).response;
+
+    if (!params.stream && response) {
+      const parsedResponse = JSON.parse(response);
+
+      // Valida e ajusta o regex
+      parsedResponse.forEach((item: any) => {
+        if (item.regex) {
+          item.regex = cleanRegex(item.regex); // Limpa escapes desnecessários
+          if (!isValidRegex(item.regex)) {
+            throw createError({
+              statusCode: 400,
+              statusMessage: `Regex inválido: ${item.regex}`,
+            });
           }
-        ).response;
+        }
+      });
+
+      response = JSON.stringify(parsedResponse);
+    }
+
+    return response;
   } catch (error) {
     console.error(error);
     throw createError({
