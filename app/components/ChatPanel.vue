@@ -124,15 +124,13 @@ const sendMessage = () => {
     const message = userMessage.value;
     emit('message', message);
 
-    const userMessageIndex = props.chatHistory.findLastIndex(
-      (msg) => msg.role === "user"
-    );
-
-        resultMessages.value = categorizeMessages([{ mensagem: message }]);
-        
-         props.chatHistory[userMessageIndex].extra = resultMessages.value;
-        resultMessages.value = [];
+    resultMessages.value = categorizeMessages([{ mensagem: message }]);
+    props.chatHistory.forEach((msg, i) => {
+      if (msg.role === 'user' && msg.content === message) {
+        props.chatHistory[i].extra = resultMessages.value;
+      }
     });
+    resultMessages.value = [];
 
     userMessage.value = '';
   } catch (error) {
