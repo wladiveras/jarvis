@@ -8,32 +8,36 @@
     <UDivider />
     <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 space-y-5">
       <div
-        v-for="(message, index) in chatHistory"
-        :key="`message-${index}`"
-        class="flex items-start gap-x-4"
+      v-for="(message, index) in chatHistory"
+      :key="`message-${index}`"
+      class="flex items-start gap-x-4"
       >
-        <div
-          class="w-12 h-12 p-2 rounded-full"
-          :class="`${
-            message.role === 'user' ? 'bg-primary/20' : 'bg-blue-500/20'
-          }`"
-        >
-          <UIcon
-            :name="`${
-              message.role === 'user'
-                ? 'i-heroicons-user-16-solid'
-                : 'i-heroicons-sparkles-solid'
-            }`"
-            class="w-8 h-8"
-            :class="`${
-              message.role === 'user' ? 'text-primary-400' : 'text-blue-400'
-            }`"
-          />
-        </div>
-        <div v-if="message.role === 'user'">
-          {{ message.content }}
-        </div>
+      <div
+        class="w-12 h-12 p-2 rounded-full"
+        :class="`${
+        message.role === 'user' ? 'bg-primary/20' : 'bg-blue-500/20'
+        }`"
+      >
+        <UIcon
+        :name="`${
+          message.role === 'user'
+          ? 'i-heroicons-user-16-solid'
+          : 'i-heroicons-sparkles-solid'
+        }`"
+        class="w-8 h-8"
+        :class="`${
+          message.role === 'user' ? 'text-primary-400' : 'text-blue-400'
+        }`"
+        />
+      </div>
+      <div v-if="message.role === 'user'">
+        {{ message.content }}
+      </div>
+      <div v-else>
+        <pre v-if="isJson(message.content)" class="bg-gray-800 p-2 rounded text-sm overflow-auto" v-html="formatJson(message.content)" />
+       
         <AssistantMessage v-else :content="message.content" />
+      </div>
       </div>
       <ChatLoadingSkeleton v-if="loading === 'message'" />
       <NoChats v-if="chatHistory.length === 0" class="h-full" />
@@ -123,5 +127,39 @@ const sendMessage = () => {
   emit('message', userMessage.value);
 
   userMessage.value = '';
+};
+const isJson = (str: string): boolean => {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const formatJson = (jsonString: string): string => {
+  try {
+    const json = JSON.parse(jsonString);
+    return JSON.stringify(json, null, 2)
+      .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|\b\d+\b)/g, (match) => {
+        let cls = 'text-gray-300'; // Default color
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) {
+            cls = 'text-blue-400'; // Keys
+          } else {
+            cls = 'text-green-400'; // Strings
+          }
+        } else if (/true|false/.test(match)) {
+          cls = 'text-yellow-400'; // Booleans
+        } else if (/null/.test(match)) {
+          cls = 'text-purple-400'; // Null
+        } else if (/^\d+$/.test(match)) {
+          cls = 'text-red-400'; // Numbers
+        }
+        return `<span class="${cls}">${match}</span>`;
+      });
+  } catch (error) {
+    return jsonString;
+  }
 };
 </script>

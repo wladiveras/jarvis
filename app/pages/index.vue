@@ -41,47 +41,7 @@ const defaultSettings: LlmParams = {
   temperature: 0.2,
   maxTokens: 512,
   systemPrompt: `
-  Você é um sistema inteligente de categorização automática de mensagens enviadas por clientes em um chat de atendimento de uma autoescola.
-⚠️ Contexto:
-A autoescola oferece serviços como:
-Matrícula e início do processo da CNH (Carteira Nacional de Habilitação)
-Aulas teóricas e práticas
-Exames médicos, psicotécnico e práticos
-Laudos e documentação
-Planos com ou sem taxas inclusas
-Diferentes formas de pagamento (à vista, boleto, cartão, etc.)
-Atendimento a jovens que ainda não têm 18 anos
-Atendimento a clientes apenas interessados/pesquisando
-Sua tarefa:
-Analisar o conteúdo da mensagem abaixo enviada por um cliente.
-Verificar se ela se encaixa em alguma das categorias já existentes.
-Se sim, atualize o regex da categoria para abranger essa nova variação da frase, sem remover os padrões anteriores.
-Se não se encaixar em nenhuma categoria, sugira:
-Um nome apropriado para uma nova categoria
-Um slug no formato kebab-case
-Um regex representativo para identificar mensagens semelhantes
-Mensagem do cliente:
-"{mensagem}"
-Categorias já existentes:
-{categoriasText}
-📦 Formato esperado da resposta:
-Se a mensagem se encaixar em uma categoria existente:
-Categoria correspondente: [nome]
-Regex original: [regex atual]
-Regex atualizada: [regex nova] 
-Motivo da atualização: [explicação]
-Se a mensagem NÃO se encaixar:
-Nova categoria: [nome da nova categoria (em português, título descritivo)]
-Slug: [slug da categoria no formato kebab-case]
-Mensagens base: "{mensagem}"
-Regex:
-\\
-(regex .NET compatível com a documentação do .NET)
-\\
-Importante:
-NÃO altere a estrutura da resposta.
-O regex deve ser compatível com a linguagem .NET (C#), seguindo a documentação oficial.
-Seja objetivo e prático nas decisões.
+  "Você é um sistema de categorização inteligente de mensagens de clientes de uma autoescola. Sua tarefa é: Analisar uma lista de mensagens reais enviadas por clientes. Para cada mensagem: 1. Classifique a mensagem com uma **categoria única**, descritiva e objetiva, baseada na intenção da frase. 2. Crie uma **regex robusta no padrão .NET**, com agrupamentos e variações para detectar mensagens semelhantes. A regex deve: - Ser compatível com .NET. - Usar agrupamentos e palavras alternadas. - Lidar com português informal (abreviações, erros comuns, variações de escrita). - Ser precisa para evitar falsos positivos. Formato obrigatório da resposta (em JSON por mensagem): [ { \"mensagem\": \"<mensagem original>\", \"categoria\": \"<categoria atribuída>\", \"regex\": \"<regex .NET robusta gerada para identificar mensagens similares>\" }, ... (repetir para cada mensagem) ] ⚠️ Não adicione explicações nem mensagens fora do JSON. ⚠️ Não agrupe tudo em uma única categoria genérica, seja específico na intenção de cada frase. ⚠️ Não escreva texto fora do JSON. 📥 Mensagens: {mensagens} 📂 Categorias já existentes (para tentar agrupar): {categoriasText}"
   `,
   stream: true,
 };
