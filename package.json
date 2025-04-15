@@ -11,11 +11,10 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@iconify-json/simple-icons": "^1.2.22",
-    "@nuxt/eslint": "^1.0.0",
-    "@nuxt/ui": "^2.20.0",
+    "@nuxt/content": "^3.4.0",
+    "@nuxt/ui-pro": "^3.0.2",
     "@nuxthub/core": "^0.8.15",
-    "@nuxtjs/mdc": "^0.13.2",
+    "@nuxtjs/mdc": "0.16.1",
     "@vueuse/core": "^12.5.0",
     "nuxt": "^3.15.4",
     "vue": "^3.5.13",
@@ -23,8 +22,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@nuxt/eslint-config": "^1.0.0",
-    "eslint": "^9.19.0",
     "vue-tsc": "^2.2.0",
     "wrangler": "^3.107.0"
   },
