@@ -7,55 +7,33 @@
       @show-drawer="$emit('showDrawer')"
     />
     <UDivider />
-    <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 space-y-5">
+        <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 space-y-5">
       <div
-      v-for="(message, index) in chatHistory"
-      :key="`message-${index}-${message.extra}`"
-      class="flex items-start gap-x-4"
-
-
-
-
-        
+        v-for="(message, index) in chatHistory"
+        :key="`message-${index}`"
+        class="flex items-start gap-x-4"
       >
-      <div
-        class="w-12 h-12 p-2 rounded-full"
-        :class="`${
-        message.role === 'user' ? 'bg-primary/20' : 'bg-blue-500/20'
-        }`"
-      >
-        <UIcon
-        :name="`${
-          message.role === 'user'
-          ? 'i-heroicons-user-16-solid'
-          : 'i-heroicons-sparkles-solid'
-        }`"
-        class="w-8 h-8"
-        :class="`${
-          message.role === 'user' ? 'text-primary-400' : 'text-blue-400'
-        }`"
-        />
+        <div
+          class="w-12 h-12 p-2 rounded-full"
+          :class="`${message.role === 'user' ? 'bg-primary/20' : 'bg-blue-500/20'}`"
+        >
+          <UIcon
+            :name="`${
+              message.role === 'user'
+                ? 'i-heroicons-user-16-solid'
+                : 'i-heroicons-sparkles-solid'
+            }`"
+            class="w-8 h-8"
+            :class="`${message.role === 'user' ? 'text-primary-400' : 'text-blue-400'}`"
+          />
       </div>
-      <div v-if="message.role === 'user'">
-         {{ message.content }}
-         <pre v-if="Array.isArray(message.extra)" class="bg-gray-800 p-2 rounded text-sm overflow-auto" v-html="formatJson(JSON.stringify(message.extra))" />
-      </div>
-      <div v-else>
         <pre v-if="isJson(message.content)" class="bg-gray-800 p-2 rounded text-sm overflow-auto" v-html="formatJson(message.content)" />
-
-
-
-        
-        
-        
-        
-        
         <AssistantMessage v-else :content="message.content" />
-      </div>
       </div>
       <ChatLoadingSkeleton v-if="loading === 'message'" />
       <NoChats v-if="chatHistory.length === 0" class="h-full" />
     </div>
+
     <UDivider />
     <div class="flex items-start p-3.5 relative">
       <UTextarea
@@ -146,13 +124,15 @@ const sendMessage = () => {
     const message = userMessage.value;
     emit('message', message);
 
-    resultMessages.value = categorizeMessages([{ mensagem: message }]);
-    props.chatHistory.forEach((msg, i) => {
-      if (msg.role === 'user' && msg.content === message) {
-        props.chatHistory[i].extra = resultMessages.value;
-      }
+    const userMessageIndex = props.chatHistory.findLastIndex(
+      (msg) => msg.role === "user"
+    );
+
+        resultMessages.value = categorizeMessages([{ mensagem: message }]);
+        
+         props.chatHistory[userMessageIndex].extra = resultMessages.value;
+        resultMessages.value = [];
     });
-    resultMessages.value = [];
 
     userMessage.value = '';
   } catch (error) {
