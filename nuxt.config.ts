@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   future: { compatibilityVersion: 4 },
 
   // https://nuxt.com/modules
-  modules: ['@nuxt/ui-pro', '@nuxt/content', '@nuxthub/core'],
+  modules: ['@nuxt/ui-pro', '@nuxt/content', '@nuxtjs/mdc', '@nuxthub/core'],
   css: ['~/assets/css/main.css'],
 
   // https://hub.nuxt.com/docs/getting-started/installation#options
