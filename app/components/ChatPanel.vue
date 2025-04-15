@@ -142,24 +142,24 @@ watch(
 const sendMessage = () => {
   if (!userMessage.value.trim()) return;
 
-  const message = userMessage.value;
-  emit('message', message);
-  
-  resultMessages.value = categorizeMessages([{ mensagem: message }]);
-    props.chatHistory.forEach((msg, i) => {
-     if(msg.role === 'user' && msg.content === message){
-      props.chatHistory[i].extra = resultMessages.value;
-     }
-  })
-  resultMessages.value = []
+  try {
+    const message = userMessage.value;
+    emit('message', message);
 
-  
+    resultMessages.value = categorizeMessages([{ mensagem: message }]);
+    props.chatHistory.forEach((msg, i) => {
+      if (msg.role === 'user' && msg.content === message) {
+        props.chatHistory[i].extra = resultMessages.value;
+      }
+    });
+    resultMessages.value = [];
+
     userMessage.value = '';
-   
   } catch (error) {
-    return false;
+    console.error("Erro ao enviar mensagem:", error);
   }
 };
+
 const isJson = (str: string): boolean => {
   try {
     JSON.parse(str);
