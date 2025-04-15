@@ -166,7 +166,10 @@ const formatJson = (jsonString: string): string => {
     const json = JSON.parse(jsonString);
 
     // Substitui \\s por espaços reais em todos os valores de regex
-    const processedJson = JSON.stringify(json, null, 2).replace(/\\\\s/g, " ");
+    const processedJson = JSON.stringify(json, null, 2)
+    .replace(/\\\\s/g, " ")
+    .replace(/\\\\b/g, "\\b")
+    .replace(/\\\\d/g, "\\d");
 
     return processedJson.replace(
       /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|\b\d+\b)/g,
