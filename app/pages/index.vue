@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-const input = ref('');
+const input = useState('input', () => '');
 const response = ref('');
 const loading = ref(false);
 
@@ -31,13 +31,12 @@ const analisarMensagens = async () => {
   loading.value = true;
 
   try {
-    const { data } = await useFetch('/api/analyze', {
+    const data = await $fetch('/api/analyze', {
       method: 'POST',
       body: { mensagens: input.value },
     });
-
     // Atualiza o response diretamente com o texto retornado pela API;
-    response.value = data.value;
+    response.value = data;
 
   } catch (err) {
     console.error('Erro ao analisar mensagens:', err);
